@@ -24,6 +24,8 @@ import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 import cz.msebera.android.httpclient.Header;
 
 import static com.loopj.android.http.AsyncHttpClient.log;
@@ -40,6 +42,9 @@ public class WeatherController extends AppCompatActivity {
     final long MIN_TIME = 5000;
     // Distance between location updates (1000m or 1km)
     final float MIN_DISTANCE = 1000;
+    
+    // Tag
+    final String TAG = "Clima";
 
     // TODO: Set LOCATION_PROVIDER here:
     String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
@@ -81,19 +86,27 @@ public class WeatherController extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Clima", "onResume() called");
+        Log.d(TAG, "onResume() called");
 
         Intent myIntent = getIntent();
         String city = myIntent.getStringExtra("City");
-
-        if (city !=null) {
+        HashMap<String, Double> lonlat = (HashMap<String, Double>) myIntent.getSerializableExtra("LatLng");
+        if (city != null) {
+            Log.d(TAG, city);
             getWeatherForNewCity(city);
+        } else if (lonlat != null) {
+            Log.d(TAG, lonlat.toString());
+            String longitude = String.valueOf(lonlat.get("lon"));
+            String latitude = String.valueOf(lonlat.get("lat"));
+            Log.d(TAG, "logitude is " + longitude);
+            Log.d(TAG, "latitude is " + latitude);
+            getWeatherForNewCityByLonLat(longitude, latitude);
         } else {
-            Log.d("Clima", "Getting weather for current location");
+            Log.d(TAG, "Getting weather for current location");
             getWeatherForCurrentLocation();
         }
 
-        Log.d("Clima", "Getting weather for current location");
+        Log.d(TAG, "Getting weather for current location");
         getWeatherForCurrentLocation();
 
     }
@@ -106,6 +119,16 @@ public class WeatherController extends AppCompatActivity {
         letsDoSomeNetworking(params);
     }
 
+    private void getWeatherForNewCityByLonLat(String longitude, String latitude) {
+        Log.d(TAG, "logitude is " + longitude);
+        Log.d(TAG, "latitude is " + latitude);
+        RequestParams params = new RequestParams();
+        params.put("lat", latitude);
+        params.put("lon", longitude);
+        params.put("appid", APP_ID);
+        letsDoSomeNetworking(params);
+    }
+
     // TODO: Add getWeatherForCurrentLocation() here:
     private void getWeatherForCurrentLocation() {
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -113,32 +136,33 @@ public class WeatherController extends AppCompatActivity {
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("Clima", "onLocationChaged(): callback received!");
+                Log.d(TAG, "onLocationChaged(): callback received!");
                 String longitude = String.valueOf(location.getLongitude());
                 String latitude = String.valueOf(location.getLatitude());
-                Log.d("Clima", "logitude is " + longitude);
-                Log.d("Clima", "latitude is " + latitude);
-
-                RequestParams params = new RequestParams();
-                params.put("lat ", latitude);
-                params.put("lon", longitude);
-                params.put("appid", APP_ID);
-                letsDoSomeNetworking(params);
+//                Log.d(TAG, "logitude is " + longitude);
+//                Log.d(TAG, "latitude is " + latitude);
+                getWeatherForNewCityByLonLat(longitude, latitude);
+//                RequestParams params = new RequestParams();
+//                params.put("lat", latitude);
+//                params.put("lon", longitude);
+//                params.put("appid", APP_ID);
+//                Log.d(TAG, params.toString());
+//                letsDoSomeNetworking(params);
             }
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d("Clima", "onStatusChanged(): callback received!");
+                Log.d(TAG, "onStatusChanged(): callback received!");
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-                Log.d("Clima", "onProviderEnabled(): callback received!");
+                Log.d(TAG, "onProviderEnabled(): callback received!");
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-                Log.d("Clima", "onProviderDisabled(): callback received!");
+                Log.d(TAG, "onProviderDisabled(): callback received!");
             }
         };
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -162,10 +186,10 @@ public class WeatherController extends AppCompatActivity {
 
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Clima", "onRequestPermissionsResult(): Permission granted!");
+                Log.d(TAG, "onRequestPermissionsResult(): Permission granted!");
                 getWeatherForCurrentLocation();
             } else {
-                Log.d("Clima", "Permission denied");
+                Log.d(TAG, "Permission denied");
             }
         }
     }
@@ -177,15 +201,16 @@ public class WeatherController extends AppCompatActivity {
         client.get(WEATHER_URL, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.d("Clima", "Succes! JSON: " + response.toString());
+                Log.d(TAG, "Succes! JSON: " + response.toString());
                 WeatherDataModel weatherData = WeatherDataModel.fromJson(response);
                 updateUI(weatherData);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e("Clima", "Fail " + throwable.toString());
-                Log.e("Clima", "Status code " + statusCode);
+                Log.e(TAG, "Fail " + throwable.toString());
+                Log.e(TAG, "Response " + errorResponse.toString());
+                Log.e(TAG, "Status code " + statusCode);
                 Toast.makeText(WeatherController.this, "Request Failed", Toast.LENGTH_SHORT).show();
             }
         });

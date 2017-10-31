@@ -22,6 +22,9 @@
         </activity>
         <activity android:name=".ChangeCityController">
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCqd2Lqzvf9raparg9v61t6GyxWL_aK3Mg"/>
     </application>
 
 </manifest>
