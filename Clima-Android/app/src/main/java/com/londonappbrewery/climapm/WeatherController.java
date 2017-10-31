@@ -120,7 +120,7 @@ public class WeatherController extends AppCompatActivity {
                 Log.d("Clima", "latitude is " + latitude);
 
                 RequestParams params = new RequestParams();
-                params.put("lat", latitude);
+                params.put("lat ", latitude);
                 params.put("lon", longitude);
                 params.put("appid", APP_ID);
                 letsDoSomeNetworking(params);
