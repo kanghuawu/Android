@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -17,12 +18,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 public class MainChatActivity extends AppCompatActivity {
 
-    // TODO: Add member variables here:
     private String mDisplayName;
     private ListView mChatListView;
     private EditText mInputText;
     private ImageButton mSendButton;
     private DatabaseReference mDatabaseReference;
+    private ChatListAdaptor mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,15 +77,17 @@ public class MainChatActivity extends AppCompatActivity {
         }
     }
 
-    // TODO: Override the onStart() lifecycle method. Setup the adapter here.
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter = new ChatListAdaptor(this, mDatabaseReference, mDisplayName);
+        mChatListView.setAdapter(mAdapter);
+    }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        // TODO: Remove the Firebase event listener on the adapter.
-
+        mAdapter.cleanUp();
     }
 
 }

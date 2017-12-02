@@ -30,7 +30,6 @@ public class RegisterActivity extends AppCompatActivity {
     public static final String CHAT_PREFS = "ChatPrefs";
     public static final String DISPLAY_NAME_KEY = "username";
 
-    // TODO: Add member variables here:
     // UI references.
     private AutoCompleteTextView mEmailView;
     private AutoCompleteTextView mUsernameView;
@@ -63,9 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        // TODO: Get hold of an instance of FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
-
     }
 
     // Executed when Sign Up button is pressed.
@@ -86,8 +83,11 @@ public class RegisterActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
+        Log.d("FlashChat", "email: " + email);
+
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+            Log.d("FlashChat", "some thing wrong with password");
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -109,7 +109,6 @@ public class RegisterActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // TODO: Call create FirebaseUser() here
             createFirebaseUser();
         }
     }
@@ -125,7 +124,6 @@ public class RegisterActivity extends AppCompatActivity {
         return confirmPassword.equals(confirmPassword) && password.length() > 4;
     }
 
-    // TODO: Create a Firebase user
     private void createFirebaseUser() {
 
         String email = mEmailView.getText().toString();
@@ -148,14 +146,12 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    // TODO: Save the display name to Shared Preferences
     private void saveDisplayName() {
         String displayName = mUsernameView.getText().toString();
         SharedPreferences prefs = getSharedPreferences(CHAT_PREFS, 0);
         prefs.edit().putString(DISPLAY_NAME_KEY, displayName);
     }
 
-    // TODO: Create an alert dialog to show in case registration failed
     private void showErrorDialog(String message) {
 
         new AlertDialog.Builder(this)
@@ -165,7 +161,4 @@ public class RegisterActivity extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-
-
 }

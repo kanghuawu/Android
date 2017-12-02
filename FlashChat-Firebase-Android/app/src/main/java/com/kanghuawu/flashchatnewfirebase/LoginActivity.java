@@ -47,32 +47,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // TODO: Grab an instance of FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
+        Log.d("FlashChat", "Current user" + mAuth.getCurrentUser().getEmail().toString());
     }
 
     // Executed when Sign in button pressed
     public void signInExistingUser(View v)   {
         // TODO: Call attemptLogin() here
-
+        attemptLogin();
     }
 
     // Executed when Register button pressed
     public void registerNewUser(View v) {
-        Intent intent = new Intent(this, com.kanghuawu.flashchatnewfirebase.RegisterActivity.class);
+        Intent intent = new Intent(this, RegisterActivity.class);
         finish();
         startActivity(intent);
     }
 
-    // TODO: Complete the attemptLogin() method
     private void attemptLogin() {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         if (email.equals("") || password.equals("")) return;
         Toast.makeText(this, "Login in progress...", Toast.LENGTH_SHORT);
-
-        // TODO: Use FirebaseAuth to sign in with email & password
 
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -92,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    // TODO: Show error on screen with an alert dialog
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Oops")
@@ -101,6 +97,4 @@ public class LoginActivity extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
-
-
 }
